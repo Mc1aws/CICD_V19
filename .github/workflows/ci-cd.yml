@@ -77,7 +77,6 @@ jobs:
           retention-days: 30
 
   # ====================== STAGE 4: DEPLOY (Docker) ======================
-  # Берёт .deb из предыдущего этапа, кладёт в Ubuntu-контейнер, проверяет работу
   deploy:
     name: Deploy (Docker)
     runs-on: ubuntu-latest
@@ -105,27 +104,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase repository owner
+        id: repo
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+
       - name: Build Docker image
         run: |
           cp ./artifacts/v19-project.deb ./v19-project.deb
-          docker build -t ghcr.io/${{ github.repository_owner }}/v19-project:latest .
+          docker build -t ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:latest .
 
       - name: Run Docker image (smoke test)
         run: |
           echo "Running container with test input..."
           echo "1 2 3 4 5 6 7 8 9 100
-          10 20 30 40 50 -5 -10 0 25 35" | docker run -i --rm ghcr.io/${{ github.repository_owner }}/v19-project:latest
+          10 20 30 40 50 -5 -10 0 25 35" | docker run -i --rm ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:latest
           echo "Container exited successfully"
 
       - name: Push Docker image to GHCR
         if: github.event_name == 'push'
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/v19-project:latest
+          docker push ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:latest
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
-            docker tag ghcr.io/${{ github.repository_owner }}/v19-project:latest \
-                       ghcr.io/${{ github.repository_owner }}/v19-project:$TAG
-            docker push ghcr.io/${{ github.repository_owner }}/v19-project:$TAG
+            docker tag ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:latest \
+                       ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:$TAG
+            docker push ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:$TAG
           fi
 
   # ====================== STAGE 5: RELEASE ======================
@@ -146,6 +149,10 @@ jobs:
           name: v19-deb-package
           path: ./release
 
+      - name: Set lowercase repository owner
+        id: repo
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -156,7 +163,7 @@ jobs:
 
             **Что внутри:**
             - `v19-project.deb` — debian-пакет с программой по варианту 19
-            - Docker-образ: `ghcr.io/${{ github.repository_owner }}/v19-project:${{ github.ref_name }}`
+            - Docker-образ: `ghcr.io/${{ steps.repo.outputs.owner }}/v19-project:${{ github.ref_name }}`
 
             **Установка:**
             ```bash
