@@ -1,0 +1,12 @@
+v19
+build/
+*.deb
+*.o
+*.obj
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.tar
