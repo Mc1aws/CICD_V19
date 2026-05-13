@@ -8,10 +8,9 @@ CONTROL     = DEBIAN/control
 CC          = g++
 CFLAGS      = -Wall -Wextra -std=c++17 -O2
 
-.PHONY: all check build deb run clean
+.PHONY: all check build deb run test clean
 
 all: check build
-
 
 check:
 	@which $(CC) > /dev/null || (echo "g++ not installed. Install build-essential" && exit 1)
@@ -23,7 +22,6 @@ build: $(BINARY)
 $(BINARY): $(SRC_DIR)/main.cpp
 	$(CC) $(CFLAGS) $(SRC_DIR)/main.cpp -o $(BINARY)
 	@echo "Binary built: ./$(BINARY)"
-
 
 deb: check $(BINARY)
 	rm -rf $(BUILD)
@@ -37,6 +35,9 @@ deb: check $(BINARY)
 
 run: $(BINARY)
 	./$(BINARY)
+
+test: $(BINARY)
+	bash cicd/run_tests.sh
 
 clean:
 	rm -f $(BINARY)
