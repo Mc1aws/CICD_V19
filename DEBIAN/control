@@ -1,0 +1,11 @@
+Package: v19-project
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Solomon M.A.
+Depends: libc6 (>= 2.31), libstdc++6
+Description: Array Z builder program for lab 1 (variant 19)
+ A simple C++ program that reads two integer arrays X(10) and Y(10)
+ and builds array Z from elements of X greater than max(Y) and
+ elements of Y less than min(X).
