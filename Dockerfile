@@ -15,4 +15,4 @@ RUN dpkg -i /tmp/v19-project.deb && rm /tmp/v19-project.deb
 
 RUN which v19 && echo "Binary installed at: $(which v19)"
 
-CMD ["sh", "-c", "echo '1 2 3 4 5 6 7 8 9 100\n10 20 30 40 50 -5 -10 0 25 35' | v19"]
+CMD ["sh", "-c", "echo '7 25 99 14 88 3 56 102 41 18\n30 45 12 -8 50 22 -15 38 -2 60' | v19"]
